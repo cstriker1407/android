@@ -2,6 +2,7 @@ package yeah.cstriker1407.android.gps;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.location.LocationManager;
 import android.provider.Settings;
 
@@ -23,5 +24,12 @@ public class GPSUtils
 	{
 		Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 		context.startActivity(intent);
+	}
+	
+	public static float calcDistance(double startLatitude, double startLongitude, double endLatitude, double endLongitude)
+	{
+		float [] result = new float[]{-1f,0f,0f};
+		Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, result);
+		return result[0];
 	}
 }
