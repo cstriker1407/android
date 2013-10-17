@@ -9,8 +9,46 @@
     tools:context=".MainActivity" >
 
     <TextView
+        android:id="@+id/textView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="14dp"
+        android:text="sans  15.5"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:typeface="sans" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="24dp"
+        android:text="serif  15.5"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:typeface="serif" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_below="@+id/textView2"
+        android:layout_marginTop="34dp"
+        android:text="monospace  15.5"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/textView_custom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView3"
+        android:layout_marginTop="64dp"
+        android:text="custom 15.5"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>
