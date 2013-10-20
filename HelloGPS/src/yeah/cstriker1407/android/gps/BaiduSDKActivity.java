@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
@@ -124,17 +126,26 @@ public class BaiduSDKActivity extends Activity
 		option.disableCache(true);// 禁止启用缓存定位
 
 		option.setPoiNumber(10); // 最多返回POI个数
-		option.setPoiDistance(2000); // poi查询距离
+		option.setPoiDistance(5000); // poi查询距离
 		option.setPoiExtraInfo(true); // 是否需要POI的电话和地址等详细信息
 
 		option.setPriority(LocationClientOption.NetWorkFirst);
 		mLocationClient.setLocOption(option);
 		mLocationClient.start();
-		if (mLocationClient != null && mLocationClient.isStarted())
+		if (mLocationClient != null && mLocationClient.isStarted ())
 		{
 			mLocationClient.requestLocation();
-			mLocationClient.requestPoi();
+//			mLocationClient.requestPoi();
 		}
+		
+		(findViewById(R.id.button1)).setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) 
+			{
+				mLocationClient.requestPoi();
+			}
+		});
 	}
 
 	@Override

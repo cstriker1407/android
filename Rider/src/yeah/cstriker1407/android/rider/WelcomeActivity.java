@@ -2,6 +2,8 @@ package yeah.cstriker1407.android.rider;
 
 import java.lang.ref.WeakReference;
 
+import yeah.cstriker1407.android.rider.R;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +12,9 @@ import android.os.Message;
 import android.util.Log;
 
 public class WelcomeActivity extends Activity {
+	private static final String TAG = "WelcomeActivity";
 	private static final int MSG_SLEEP = 0;
-	private static final int SLEEP_TIME = 3000;
+	private static final int SLEEP_TIME = 1000;
 
 	private WelcomeActHandler handler = new WelcomeActHandler(this);
 
@@ -24,7 +27,7 @@ public class WelcomeActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		Log.e("", "on des called");
+		Log.e(TAG, "on des called");
 		super.onDestroy();
 	}
 
