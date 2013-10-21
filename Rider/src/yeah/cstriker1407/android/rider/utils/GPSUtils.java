@@ -26,6 +26,7 @@ public class GPSUtils
 		context.startActivity(intent);
 	}
 	
+	/* ·µ»ØÃ× */
 	public static float calcDistance(double startLatitude, double startLongitude, double endLatitude, double endLongitude)
 	{
 		float [] result = new float[]{-1f,0f,0f};

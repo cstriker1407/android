@@ -21,14 +21,24 @@ public final class R {
         public static final int activity_vertical_margin=0x7f040001;
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
-        public static final int welcome=0x7f020001;
+        public static final int compass=0x7f020000;
+        public static final int following=0x7f020001;
+        public static final int gotomypos=0x7f020002;
+        public static final int ic_launcher=0x7f020003;
+        public static final int loc_fail=0x7f020004;
+        public static final int loc_gps=0x7f020005;
+        public static final int loc_net=0x7f020006;
+        public static final int normal=0x7f020007;
+        public static final int welcome=0x7f020008;
     }
     public static final class id {
-        public static final int act_welcome_welcomeView=0x7f080008;
-        public static final int action_settings=0x7f080009;
-        public static final int bdmapview=0x7f080007;
-        public static final int tv_currloc=0x7f080006;
+        public static final int act_welcome_welcomeView=0x7f08000b;
+        public static final int action_settings=0x7f08000c;
+        public static final int bdmapview=0x7f080006;
+        public static final int btn_gotomypos=0x7f080007;
+        public static final int btn_switchlocmode=0x7f080008;
+        public static final int image_locstatus=0x7f080009;
+        public static final int tv_currloc=0x7f08000a;
         public static final int tv_currtime=0x7f080005;
         public static final int tv_speedsel=0x7f080001;
         public static final int tv_speedunit=0x7f080002;

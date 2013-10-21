@@ -5,6 +5,7 @@ import java.util.Date;
 
 import yeah.cstriker1407.android.rider.storage.Bitmaps;
 import yeah.cstriker1407.android.rider.storage.Locations;
+import yeah.cstriker1407.android.rider.storage.Locations.LocDesc.LocTypeEnum;
 import yeah.cstriker1407.android.rider.storage.Locations.SpeedInfo;
 import yeah.cstriker1407.android.rider.utils.TimeUtils;
 import android.app.Activity;
@@ -17,6 +18,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
@@ -45,6 +48,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView tv_currtime;
 	private TextView tv_currloc;
 	
+	private ImageButton btn_gotomypos;
+	private ImageButton btn_switchlocmode;
+	private ImageView   image_locstatus;
+	
 	private LocationClient mLocationClient = null;
 	private MainActHandler handler = new MainActHandler(this);
 	private SpeedSelEnum speedSelEnum = SpeedSelEnum.CUR;
@@ -54,11 +61,60 @@ public class MainActivity extends Activity implements OnClickListener {
 	private MapController mMapController = null;
 	private MyLocationOverlay myLocationOverlay = null; 
 	private LocationData locData = null;
+	private LocationMode locationMode = LocationMode.COMPASS;
+
+	private void setLocMode(LocationMode locMode)
+	{
+		int imageId;
+		switch (locMode) 
+		{
+			case NORMAL:
+			{
+				imageId = R.drawable.normal;break;
+			}
+			case FOLLOWING:
+			{
+				imageId = R.drawable.following;break;
+			}		
+			case COMPASS:
+			default:
+			{
+				imageId = R.drawable.compass;break;
+			}
+		}
+		btn_switchlocmode.setImageResource(imageId);
+		
+		if (myLocationOverlay != null)
+		{
+			myLocationOverlay.setLocationMode(locMode);
+			
+			if(LocationMode.COMPASS == locMode)
+			{
+				myLocationOverlay.enableCompass();
+			}else
+			{
+				myLocationOverlay.disableCompass();
+			}
+		}
+		
+		if (mMapController != null)
+		{
+			if(LocationMode.COMPASS == locMode)
+			{
+				mMapController.setOverlooking(-45);
+			}else
+			{
+				mMapController.setOverlooking(0);
+			}
+		}
+	}
+	
 	
 	
 	/* MSG_INDEX */
 	private static final int MSG_SPEEDUPDATE = 0;
 	private static final int MSG_TIMEUPDATE = 1;
+	private static final int MSG_LOCDESUPDATE = 2;
 	
 	
 	
@@ -67,16 +123,43 @@ public class MainActivity extends Activity implements OnClickListener {
 		public void onReceiveLocation(BDLocation location) {
 			if (location == null)
 				return;
-
+			
+			Locations.LocDesc.LocTypeEnum locTypeEnum = LocTypeEnum.FAIL;
+			switch (location.getLocType()) 
+			{
+				case BDLocation.TypeGpsLocation:
+				{
+					locTypeEnum = LocTypeEnum.GPS;
+					break;
+				}
+				case BDLocation.TypeNetWorkLocation:
+				{
+					locTypeEnum = LocTypeEnum.NET;
+					break;
+				}
+				default:
+				{
+					locTypeEnum = LocTypeEnum.FAIL;
+					break;
+				}
+			}
+			Locations.LocDesc locDesc = Locations.getInstance().getLocDes(
+					location.getAddrStr(), locTypeEnum, location.getRadius());
+			Message locDescMsg = new Message();
+			locDescMsg.what = MSG_LOCDESUPDATE;
+			locDescMsg.obj = locDesc;
+			handler.sendMessage(locDescMsg);
+			
+			
+			
 			Locations.SpeedInfo speedInfo = Locations.getInstance().calcSpeedInfo(
 					location.getLatitude(),
-					location.getLongitude(),
-					location.getAddrStr());
+					location.getLongitude());
 			
-			Message msg = new Message();
-			msg.what = MSG_SPEEDUPDATE;
-			msg.obj = speedInfo;
-			handler.sendMessage(msg);
+			Message speedInfoMsg = new Message();
+			speedInfoMsg.what = MSG_SPEEDUPDATE;
+			speedInfoMsg.obj = speedInfo;
+			handler.sendMessage(speedInfoMsg);
 			
 			
             locData.latitude = location.getLatitude();
@@ -90,7 +173,7 @@ public class MainActivity extends Activity implements OnClickListener {
             mMapView.refresh();
             //移动到定位点
             /* 在罗盘和跟随模式下，地图会自动的animate到最新的位置，在普通模式下，不会。 */
-            mMapController.animateTo(new GeoPoint((int)(locData.latitude* 1e6), (int)(locData.longitude *  1e6)));
+//            mMapController.animateTo(new GeoPoint((int)(locData.latitude* 1e6), (int)(locData.longitude *  1e6)));
 		}
 
 		@Override
@@ -148,6 +231,14 @@ public class MainActivity extends Activity implements OnClickListener {
 		tv_speedy.setTypeface(lcdTf);
 		tv_speedunit.setTypeface(lcdTf);
 		tv_totaldistance.setTypeface(lcdTf);
+		
+		
+		btn_gotomypos = (ImageButton)findViewById(R.id.btn_gotomypos);
+		btn_switchlocmode = (ImageButton)findViewById(R.id.btn_switchlocmode);
+		btn_gotomypos.setOnClickListener(this);
+		btn_switchlocmode.setOnClickListener(this);
+		
+		image_locstatus = (ImageView)findViewById(R.id.image_locstatus);
 		//===
 		
 		
@@ -157,7 +248,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 
 		mMapView=(MapView)findViewById(R.id.bdmapview);  
-		mMapView.setBuiltInZoomControls(true);  
+		mMapView.setBuiltInZoomControls(true);
+		mMapView.showScaleControl(true);
 		//设置启用内置的缩放控件  
 		mMapController=mMapView.getController();  
 		// 得到mMapView的控制权,可以用它控制和驱动平移和缩放  
@@ -176,11 +268,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		myLocationOverlay = new MyLocationOverlay(mMapView);
 		//设置定位数据
 	    myLocationOverlay.setData(locData);
-	    //添加定位图层
-		mMapView.getOverlays().add(myLocationOverlay);
+	    
+	    setLocMode(locationMode);
 		myLocationOverlay.enableCompass();
 
-		myLocationOverlay.setLocationMode(LocationMode.COMPASS);
+		//添加定位图层
+		mMapView.getOverlays().add(myLocationOverlay);
 		//修改定位数据后刷新图层生效
 		mMapView.refresh();
 		
@@ -312,7 +405,14 @@ public class MainActivity extends Activity implements OnClickListener {
 					this.sendEmptyMessageDelayed(MSG_TIMEUPDATE, 1000);
 					break;
 				}
-			
+				case MSG_LOCDESUPDATE:
+				{
+					Locations.LocDesc locDesc = (Locations.LocDesc)msg.obj;
+					act.image_locstatus.setImageResource(locDesc.typeEnum.getImageId());
+					act.tv_currloc.setText(locDesc.locAddr);
+					break;
+				}
+				
 				case MSG_SPEEDUPDATE:
 				{
 					Locations.SpeedInfo info = (SpeedInfo) msg.obj;
@@ -350,7 +450,6 @@ public class MainActivity extends Activity implements OnClickListener {
 						String totalDistance = String.format("%.3fKM/%s", totalDiatanceKM, TimeUtils.fmtMs2Str(info.totalSeconds*1000, "HH:mm:ss"));
 						act.tv_totaldistance.setText(totalDistance);
 						act.tv_speedsel.setText(act.speedSelEnum.getSpeedDes());//当前速度描述
-						act.tv_currloc.setText(info.locDes);
 					}
 					
 					break;
@@ -369,13 +468,45 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.tv_speedsel:
 		case R.id.tv_speedunit:
 		{
-			mMapView.getCurrentMap();
-			
-			
+//			mMapView.getCurrentMap();
 			speedSelEnum = speedSelEnum.getNext();
 			tv_speedsel.setText(speedSelEnum.getSpeedDes());
 			break;
 		}
+		
+		case R.id.btn_gotomypos:
+		{
+			if (mMapController != null && locData != null)
+			{
+				mMapController.animateTo(new GeoPoint((int)(locData.latitude* 1e6), (int)(locData.longitude *  1e6)));
+			}
+			break;
+		}
+		case R.id.btn_switchlocmode:
+		{
+			switch (locationMode) 
+			{
+				case COMPASS:
+				{
+					locationMode = LocationMode.FOLLOWING;
+					break;
+				}
+				case FOLLOWING:
+				{
+					locationMode = LocationMode.NORMAL;
+					break;
+				}
+				case NORMAL:
+				default:
+				{
+					locationMode = LocationMode.COMPASS;
+					break;
+				}
+			}
+			setLocMode(locationMode);
+			break;
+		}
+		
 		default:
 			break;
 		}

@@ -49,7 +49,7 @@
         <TextView
             android:id="@+id/tv_totaldistance"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/tv_speedx"
@@ -60,13 +60,47 @@
         <TextView
             android:id="@+id/tv_currtime"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/tv_totaldistance"
             android:text="2013.10.17 11:25:25 PM"
             android:gravity="center"
             android:textSize="25dp" />
+        
+        <com.baidu.mapapi.map.MapView
+	        android:id="@+id/bdmapview"
+	        android:layout_below="@+id/tv_currtime"
+	        android:layout_width="fill_parent"
+	        android:layout_height="250dp"
+	        android:clickable="true" />
+       
+        <ImageButton
+            android:id="@+id/btn_gotomypos"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/bdmapview"
+            android:src="@drawable/gotomypos" 
+            />
+        
+		<ImageButton
+            android:id="@+id/btn_switchlocmode"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/btn_gotomypos"
+            android:src="@drawable/compass" />
+		
+		<ImageView
+            android:id="@+id/image_locstatus"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/btn_switchlocmode"
+            android:layout_marginTop="45dp"
+            android:src="@drawable/loc_fail" />
+        
 
         <TextView
             android:id="@+id/tv_currloc"
@@ -74,14 +108,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/tv_currtime"
+            android:layout_below="@+id/bdmapview"
             android:text="TextView" 
             android:gravity="center"
             android:textSize="20dp"/>
-        <com.baidu.mapapi.map.MapView
-	        android:id="@+id/bdmapview"
-	        android:layout_below="@+id/tv_currloc"
-	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
-	        android:clickable="true" />
+
+
 </RelativeLayout>
