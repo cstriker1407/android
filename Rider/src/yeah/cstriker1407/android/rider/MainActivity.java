@@ -150,6 +150,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			locDescMsg.obj = locDesc;
 			handler.sendMessage(locDescMsg);
 			
+			Log.d(TAG,locDesc.toString());
 			
 			
 			Locations.SpeedInfo speedInfo = Locations.getInstance().calcSpeedInfo(
@@ -316,7 +317,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		option.setPoiDistance(2000); // poi查询距离
 		option.setPoiExtraInfo(true); // 是否需要POI的电话和地址等详细信息
 
-		option.setPriority(LocationClientOption.NetWorkFirst);
+		option.setPriority(LocationClientOption.GpsFirst);
 		mLocationClient.setLocOption(option);
 	}
 
@@ -456,6 +457,13 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 			}
 		}
+	}
+
+	
+	@Override
+	public void onBackPressed() {
+		this.finish();
+		super.onBackPressed();
 	}
 
 	@Override

@@ -53,7 +53,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/tv_speedx"
-            android:text="200.000KM/20:10:30"
+            android:text="000.000KM/00:00:00"
             android:gravity="center"
             android:textSize="35dp" />
 
