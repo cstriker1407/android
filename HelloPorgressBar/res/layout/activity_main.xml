@@ -21,7 +21,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true" 
+        
+        />
 
     <ProgressBar
         android:id="@+id/bar_small"
@@ -39,6 +41,108 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/bar_large"
-        android:layout_marginTop="24dp" />
+/>
+
+    <Button
+        android:id="@+id/btn_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="Button" />
+
+    <Button
+        android:id="@+id/btn_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="Button" />
+
+    <Button
+        android:id="@+id/btn_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Button" />
+
+    <ProgressBar
+        android:id="@+id/bar_color"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/bar_horizontal"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/sword_black"
+        android:progressDrawable="@drawable/picture" />
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        android:indeterminateDrawable="@drawable/dialog_style_xml_color"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/bar_color" />
+
+    <ProgressBar
+        android:id="@+id/progressBar2"
+        android:indeterminateDrawable="@drawable/circle_progress_rotate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/progressBar1"
+        android:layout_toRightOf="@+id/btn_left" />
+
+    <ProgressBar
+        android:id="@+id/progressBar3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/progressBar1"
+        android:indeterminateDrawable="@drawable/color_progressbar"
+        android:max="100"
+        android:progress="50"
+        android:secondaryProgress="78" />
+
+    <ProgressBar
+        android:id="@+id/progressBar4"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:max="100"
+        android:progress="50"
+        android:secondaryProgress="78"
+        android:progressDrawable="@drawable/color_progressbar"
+        android:layout_below="@+id/progressBar3" />
+
+    <ProgressBar
+        android:id="@+id/progressBar5"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_left"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/progressBar4"
+        android:max="100"
+        android:progress="50"
+        android:progressDrawable="@drawable/vertical"
+        android:secondaryProgress="78" />
+
+    <ProgressBar
+        android:id="@+id/progressBar6"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/progressBar5"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/progressBar5"
+        android:max="100"
+        android:progress="50"
+        android:progressDrawable="@drawable/picture_progressbar" />
 
 </RelativeLayout>
