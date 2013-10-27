@@ -1,11 +1,14 @@
 package yeah.cstriker1407.android.rider.storage;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import yeah.cstriker1407.android.rider.R;
 import yeah.cstriker1407.android.rider.storage.Locations.LocDesc.LocTypeEnum;
 import yeah.cstriker1407.android.rider.utils.GPSUtils;
 import yeah.cstriker1407.android.rider.utils.TimeUtils;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 public class Locations 
@@ -28,20 +31,10 @@ public class Locations
 	private int totalDistanceM = 0;//总里程(米)
 	private Date startDate = null;//起始的时间
 	
-	/* 上次的位置是否有效 */
-	public void addToTotalDistanceM(int newM)
+	public LocDesc getLocDes(String locAddr, double latitude, double longitude,
+			float accuracy, float direction, LocTypeEnum typeEnum)
 	{
-		if (newM < 0)
-		{
-			Log.e(TAG, "addToTotalDistanceM Error: " + newM);
-			return;
-		}
-		totalDistanceM += newM;
-	}
-	
-	public LocDesc getLocDes(String addrStr, LocTypeEnum locTypeEnum, float radius)
-	{
-		return new LocDesc(addrStr, locTypeEnum, radius);
+		return new LocDesc(locAddr, latitude, longitude, accuracy, direction, typeEnum);
 	}
 	
 	public SpeedInfo calcSpeedInfo(double latitude, double longitude)
@@ -81,8 +74,10 @@ public class Locations
 	}
 	
 	
-	public static class LocDesc
+	public static class LocDesc implements Serializable
 	{
+		private static final long serialVersionUID = 1031678267503751481L;
+
 		public static enum LocTypeEnum
 		{
 			GPS(R.drawable.loc_gps),
@@ -96,26 +91,38 @@ public class Locations
 				return imageId;
 			}
 		};
+		@Deprecated
 		public String locAddr = null;
-		public float radius = 0;
+		public double latitude = 0;
+		public double longitude = 0;
+		public float accuracy = 0;
+		public float direction = 0;
 		public LocTypeEnum typeEnum = LocTypeEnum.FAIL;
 		
-		private LocDesc(String locAddr,LocTypeEnum typeEnum, float radius) {
+		private LocDesc(String locAddr, double latitude, double longitude,
+				float accuracy, float direction, LocTypeEnum typeEnum) {
 			super();
 			this.locAddr = locAddr;
+			this.latitude = latitude;
+			this.longitude = longitude;
+			this.accuracy = accuracy;
+			this.direction = direction;
 			this.typeEnum = typeEnum;
-			this.radius = radius;
 		}
 
 		@Override
 		public String toString() {
-			return "LocDesc [locAddr=" + locAddr + ", radius=" + radius
-					+ ", typeEnum=" + typeEnum + "]";
+			return "LocDesc [locAddr=" + locAddr + ", latitude=" + latitude
+					+ ", longitude=" + longitude + ", accuracy=" + accuracy
+					+ ", direction=" + direction + ", typeEnum=" + typeEnum
+					+ "]";
 		}
-	}
+	}  
 	
-	public static class SpeedInfo
+	public static class SpeedInfo implements Serializable
 	{
+		private static final long serialVersionUID = -2575095008092669515L;
+		
 		public int singleSpeedM = 0;//当前速度 m/s
 		public int maxSpeedM = 0;//最大速度 m/s
 		public int minSpeedM = 0;//最小速度 m/s

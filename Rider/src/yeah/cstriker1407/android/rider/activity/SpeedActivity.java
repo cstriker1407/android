@@ -1,10 +1,14 @@
-package yeah.cstriker1407.android.rider;
+package yeah.cstriker1407.android.rider.activity;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
 
+import yeah.cstriker1407.android.rider.R;
+import yeah.cstriker1407.android.rider.receiver.LocationBroadcast;
+import yeah.cstriker1407.android.rider.service.LocationService;
 import yeah.cstriker1407.android.rider.storage.Bitmaps;
 import yeah.cstriker1407.android.rider.storage.Locations;
+import yeah.cstriker1407.android.rider.storage.Locations.LocDesc;
 import yeah.cstriker1407.android.rider.storage.Locations.LocDesc.LocTypeEnum;
 import yeah.cstriker1407.android.rider.storage.Locations.SpeedInfo;
 import yeah.cstriker1407.android.rider.utils.TimeUtils;
@@ -36,7 +40,7 @@ import com.baidu.mapapi.map.MyLocationOverlay;
 import com.baidu.mapapi.map.MyLocationOverlay.LocationMode;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
 
-public class MainActivity extends Activity implements OnClickListener {
+public class SpeedActivity extends Activity implements OnClickListener, LocationBroadcast.onLocationChangedListener {
 
 	private static final String TAG = "MainActivity";
 	
@@ -52,7 +56,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	private ImageButton btn_switchlocmode;
 	private ImageView   image_locstatus;
 	
-	private LocationClient mLocationClient = null;
 	private MainActHandler handler = new MainActHandler(this);
 	private SpeedSelEnum speedSelEnum = SpeedSelEnum.CUR;
 	
@@ -116,71 +119,36 @@ public class MainActivity extends Activity implements OnClickListener {
 	private static final int MSG_TIMEUPDATE = 1;
 	private static final int MSG_LOCDESUPDATE = 2;
 	
-	
-	
-	private BDLocationListener bdLocationListener = new BDLocationListener() {
-		@Override
-		public void onReceiveLocation(BDLocation location) {
-			if (location == null)
-				return;
-			
-			Locations.LocDesc.LocTypeEnum locTypeEnum = LocTypeEnum.FAIL;
-			switch (location.getLocType()) 
-			{
-				case BDLocation.TypeGpsLocation:
-				{
-					locTypeEnum = LocTypeEnum.GPS;
-					break;
-				}
-				case BDLocation.TypeNetWorkLocation:
-				{
-					locTypeEnum = LocTypeEnum.NET;
-					break;
-				}
-				default:
-				{
-					locTypeEnum = LocTypeEnum.FAIL;
-					break;
-				}
-			}
-			Locations.LocDesc locDesc = Locations.getInstance().getLocDes(
-					location.getAddrStr(), locTypeEnum, location.getRadius());
-			Message locDescMsg = new Message();
-			locDescMsg.what = MSG_LOCDESUPDATE;
-			locDescMsg.obj = locDesc;
-			handler.sendMessage(locDescMsg);
-			
-			Log.d(TAG,locDesc.toString());
-			
-			
-			Locations.SpeedInfo speedInfo = Locations.getInstance().calcSpeedInfo(
-					location.getLatitude(),
-					location.getLongitude());
-			
-			Message speedInfoMsg = new Message();
-			speedInfoMsg.what = MSG_SPEEDUPDATE;
-			speedInfoMsg.obj = speedInfo;
-			handler.sendMessage(speedInfoMsg);
-			
-			
-            locData.latitude = location.getLatitude();
-            locData.longitude = location.getLongitude();
-            //如果不显示定位精度圈，将accuracy赋值为0即可
-            locData.accuracy = location.getRadius();
-            locData.direction = location.getDerect();
-            //更新定位数据
-            myLocationOverlay.setData(locData);
-            //更新图层数据执行刷新后生效
-            mMapView.refresh();
-            //移动到定位点
-            /* 在罗盘和跟随模式下，地图会自动的animate到最新的位置，在普通模式下，不会。 */
-//            mMapController.animateTo(new GeoPoint((int)(locData.latitude* 1e6), (int)(locData.longitude *  1e6)));
-		}
+	@Override
+	public void onLocationChanged(LocDesc locDesc, SpeedInfo speedInfo)
+	{
+		Message locDescMsg = new Message();
+		locDescMsg.what = MSG_LOCDESUPDATE;
+		locDescMsg.obj = locDesc;
+		handler.sendMessage(locDescMsg);
 
-		@Override
-		public void onReceivePoi(BDLocation poiLocation) {}
-	};
+		Log.d(TAG, locDesc.toString());
 
+		Message speedInfoMsg = new Message();
+		speedInfoMsg.what = MSG_SPEEDUPDATE;
+		speedInfoMsg.obj = speedInfo;
+		handler.sendMessage(speedInfoMsg);
+
+		locData.latitude = locDesc.latitude;
+		locData.longitude = locDesc.longitude;
+		// 如果不显示定位精度圈，将accuracy赋值为0即可
+		locData.accuracy = locDesc.accuracy;
+		locData.direction =locDesc.direction;
+		// 更新定位数据
+		myLocationOverlay.setData(locData);
+		// 更新图层数据执行刷新后生效
+		mMapView.refresh();
+		// 移动到定位点
+		/* 在罗盘和跟随模式下，地图会自动的animate到最新的位置，在普通模式下，不会。 */
+		// mMapController.animateTo(new GeoPoint((int)(locData.latitude* 1e6),
+		// (int)(locData.longitude * 1e6)));
+	}
+	
 	private MKMapViewListener mKMapViewListener = new MKMapViewListener() {
 		@Override
 		public void onMapMoveFinish() {}
@@ -241,13 +209,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		image_locstatus = (ImageView)findViewById(R.id.image_locstatus);
 		//===
-		
-		
-		initBDLocationSettings();
-		startBDLocationService();
-		
-		
 
+		LocationBroadcast.registerReceiver(this);
+		
+		
 		mMapView=(MapView)findViewById(R.id.bdmapview);  
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.showScaleControl(true);
@@ -260,8 +225,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		mMapController.setZoom(12);//设置地图zoom级别  
 		
 		mMapView.regMapViewListener(mBMapMan, mKMapViewListener);
-		
-		
 		
 		
         locData = new LocationData();
@@ -280,45 +243,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		
 		handler.sendEmptyMessage(MSG_TIMEUPDATE);
-		
-	}
-
-	private void startBDLocationService() {
-		if (mLocationClient != null)
-		{
-			mLocationClient.start();
-			int result = mLocationClient.requestLocation();
-			if (result != 0)
-			{
-				Log.e(TAG, "BDSDK Init Error:" + result);
-			}
-			mLocationClient.requestPoi();
-		}
-	}
-	private void stopBDLocationService() {
-		if (mLocationClient != null && mLocationClient.isStarted()) {
-			mLocationClient.stop();
-		}
-	}
-
-	private void initBDLocationSettings() {
-		mLocationClient = new LocationClient(getApplicationContext()); // 声明LocationClient类
-		mLocationClient.registerLocationListener(bdLocationListener); // 注册监听函数
-		mLocationClient.setAK("F0488f2ee7d14e2bba215419efb9bff3");
-
-		LocationClientOption option = new LocationClientOption();
-		option.setOpenGps(true);
-		option.setAddrType("all");// 返回的定位结果包含地址信息
-		option.setCoorType("bd09ll");// 返回的定位结果是百度经纬度,默认值gcj02
-		option.setScanSpan(5000);// 设置发起定位请求的间隔时间为5000ms
-		option.disableCache(true);// 禁止启用缓存定位
-
-		option.setPoiNumber(10); // 最多返回POI个数
-		option.setPoiDistance(2000); // poi查询距离
-		option.setPoiExtraInfo(true); // 是否需要POI的电话和地址等详细信息
-
-		option.setPriority(LocationClientOption.GpsFirst);
-		mLocationClient.setLocOption(option);
 	}
 
 	@Override
@@ -348,14 +272,13 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	@Override
 	protected void onDestroy() {
-		stopBDLocationService();
-		
 		 mMapView.destroy();  
 	        if(mBMapMan!=null){  
 	                mBMapMan.destroy();  
 	                mBMapMan=null;  
 	        }  
-		
+	        
+	    LocationBroadcast.unRegisterReceiver(this);
 		super.onDestroy();
 	}
 	
@@ -384,17 +307,17 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 	private static class MainActHandler extends Handler 
 	{
-		private WeakReference<MainActivity> activity = null;
+		private WeakReference<SpeedActivity> activity = null;
 
-		public MainActHandler(MainActivity act) {
+		public MainActHandler(SpeedActivity act) {
 			super();
-			this.activity = new WeakReference<MainActivity>(act);
+			this.activity = new WeakReference<SpeedActivity>(act);
 		}
 
 		@Override
 		public void handleMessage(Message msg) 
 		{
-			MainActivity act = activity.get();
+			SpeedActivity act = activity.get();
 			if (null == act) {
 				return;
 			}
@@ -464,6 +387,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onBackPressed() {
 		this.finish();
 		super.onBackPressed();
+		LocationService.stopLocationService(this);
+		System.exit(0);
 	}
 
 	@Override
@@ -519,5 +444,4 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		}
 	}
-	
 }

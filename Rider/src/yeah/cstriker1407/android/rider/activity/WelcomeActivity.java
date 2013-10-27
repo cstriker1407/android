@@ -1,8 +1,10 @@
-package yeah.cstriker1407.android.rider;
+package yeah.cstriker1407.android.rider.activity;
 
 import java.lang.ref.WeakReference;
 
 import yeah.cstriker1407.android.rider.R;
+import yeah.cstriker1407.android.rider.R.layout;
+import yeah.cstriker1407.android.rider.service.LocationService;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -23,6 +25,7 @@ public class WelcomeActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_welcome);
 		handler.sendEmptyMessageDelayed(MSG_SLEEP, SLEEP_TIME);
+		LocationService.startLocationService(this);
 	}
 
 	@Override
@@ -49,7 +52,7 @@ public class WelcomeActivity extends Activity {
 			switch (msg.what) {
 			case MSG_SLEEP:
 			{
-				act.startActivity(new Intent(act, MainActivity.class));
+				act.startActivity(new Intent(act, SpeedActivity.class));
 				act.finish();
 				break;
 			}
