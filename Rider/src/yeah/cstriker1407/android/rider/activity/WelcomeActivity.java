@@ -16,6 +16,7 @@ import android.util.Log;
 public class WelcomeActivity extends Activity {
 	private static final String TAG = "WelcomeActivity";
 	private static final int MSG_SLEEP = 0;
+	private static final int MSG_SERVICE = 1;
 	private static final int SLEEP_TIME = 1000;
 
 	private WelcomeActHandler handler = new WelcomeActHandler(this);
@@ -24,8 +25,8 @@ public class WelcomeActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_welcome);
+		handler.sendEmptyMessageDelayed(MSG_SERVICE, 500);
 		handler.sendEmptyMessageDelayed(MSG_SLEEP, SLEEP_TIME);
-		LocationService.startLocationService(this);
 	}
 
 	@Override
@@ -50,6 +51,11 @@ public class WelcomeActivity extends Activity {
 			}
 
 			switch (msg.what) {
+			case MSG_SERVICE:
+			{
+				LocationService.startLocationService(act);
+				break;
+			}
 			case MSG_SLEEP:
 			{
 				act.startActivity(new Intent(act, SpeedActivity.class));

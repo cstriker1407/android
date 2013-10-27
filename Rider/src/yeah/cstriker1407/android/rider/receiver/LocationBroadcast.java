@@ -52,23 +52,29 @@ public class LocationBroadcast
 		context.sendBroadcast(intent);
 	}
 
-	public static <T extends Context & onLocationChangedListener> void registerReceiver(T context) 
+	public static <T extends Context & onLocationChangedListener> BroadcastReceiver registerReceiver(T context) 
 	{
 		if (null == context)
 		{
-			return;
+			return null;
 		}
 		LocationReceiver receiver = new LocationReceiver(context);
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(ACTION_STR);
 		context.registerReceiver(receiver, filter);
+		return receiver;
 	}
-	public static <T extends Context & onLocationChangedListener> void unRegisterReceiver(T context) 
+	public static <T extends Context & onLocationChangedListener> void unRegisterReceiver(T context, BroadcastReceiver rev) 
 	{
-		if (null == context)
+		if (null == context || null == rev)
 		{
 			return;
 		}
-		context.unregisterReceiver(new LocationReceiver(context));
+		try {
+			context.unregisterReceiver(rev);
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
 	}
 }

@@ -29,15 +29,22 @@ public final class R {
         public static final int loc_gps=0x7f020005;
         public static final int loc_net=0x7f020006;
         public static final int normal=0x7f020007;
-        public static final int welcome=0x7f020008;
+        public static final int weather_01=0x7f020008;
+        public static final int weather_02=0x7f020009;
+        public static final int weather_03=0x7f02000a;
+        public static final int weather_05=0x7f02000b;
+        public static final int weather_10=0x7f02000c;
+        public static final int weather_15=0x7f02000d;
+        public static final int welcome=0x7f02000e;
     }
     public static final class id {
-        public static final int act_welcome_welcomeView=0x7f08000b;
-        public static final int action_settings=0x7f08000c;
+        public static final int act_welcome_welcomeView=0x7f08000d;
+        public static final int action_settings=0x7f08000e;
         public static final int bdmapview=0x7f080006;
         public static final int btn_gotomypos=0x7f080007;
         public static final int btn_switchlocmode=0x7f080008;
         public static final int image_locstatus=0x7f080009;
+        public static final int image_weather=0x7f08000b;
         public static final int tv_currloc=0x7f08000a;
         public static final int tv_currtime=0x7f080005;
         public static final int tv_speedsel=0x7f080001;
@@ -45,9 +52,10 @@ public final class R {
         public static final int tv_speedx=0x7f080000;
         public static final int tv_speedy=0x7f080003;
         public static final int tv_totaldistance=0x7f080004;
+        public static final int tv_weather=0x7f08000c;
     }
     public static final class layout {
-        public static final int activity_main=0x7f030000;
+        public static final int activity_speed=0x7f030000;
         public static final int activity_welcome=0x7f030001;
     }
     public static final class menu {
@@ -57,6 +65,7 @@ public final class R {
         public static final int action_settings=0x7f050001;
         public static final int app_name=0x7f050000;
         public static final int hello_world=0x7f050002;
+        public static final int weather_no_info=0x7f050003;
     }
     public static final class style {
         /** 

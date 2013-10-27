@@ -65,8 +65,7 @@
         <!-- 百度定位service -->
         <service
             android:name="com.baidu.location.f"
-            android:enabled="true"
-            android:process=":remote" >
+            android:enabled="true" >
         </service>
         <service android:name=".service.LocationService">
             

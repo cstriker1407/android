@@ -3,16 +3,23 @@ package yeah.cstriker1407.android.rider.activity;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 
+import org.w3c.dom.Text;
+
 import yeah.cstriker1407.android.rider.R;
 import yeah.cstriker1407.android.rider.receiver.LocationBroadcast;
+import yeah.cstriker1407.android.rider.receiver.WeatherBroadcast;
 import yeah.cstriker1407.android.rider.service.LocationService;
 import yeah.cstriker1407.android.rider.storage.Bitmaps;
 import yeah.cstriker1407.android.rider.storage.Locations;
 import yeah.cstriker1407.android.rider.storage.Locations.LocDesc;
 import yeah.cstriker1407.android.rider.storage.Locations.LocDesc.LocTypeEnum;
 import yeah.cstriker1407.android.rider.storage.Locations.SpeedInfo;
+import yeah.cstriker1407.android.rider.utils.BDUtils;
 import yeah.cstriker1407.android.rider.utils.TimeUtils;
+import yeah.cstriker1407.android.rider.utils.WeatherUtils;
+import yeah.cstriker1407.android.rider.utils.WeatherUtils.WeatherInfo;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -25,6 +32,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -40,9 +48,13 @@ import com.baidu.mapapi.map.MyLocationOverlay;
 import com.baidu.mapapi.map.MyLocationOverlay.LocationMode;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
 
-public class SpeedActivity extends Activity implements OnClickListener, LocationBroadcast.onLocationChangedListener {
-
-	private static final String TAG = "MainActivity";
+public class SpeedActivity extends Activity implements OnClickListener, LocationBroadcast.onLocationChangedListener,
+WeatherBroadcast.onWeatherChangedListener
+{
+	private static final String TAG = "SpeedActivity";
+	
+	private TextView tv_weather;
+	private ImageButton image_weather;
 	
 	private TextView tv_speedx;
 	private TextView tv_speedy;
@@ -58,6 +70,9 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 	
 	private MainActHandler handler = new MainActHandler(this);
 	private SpeedSelEnum speedSelEnum = SpeedSelEnum.CUR;
+	private WeatherUtils.WeatherInfo weatherInfo = null;
+	
+	
 	
 	private BMapManager mBMapMan = null;  
 	private MapView mMapView = null;  
@@ -112,13 +127,17 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 		}
 	}
 	
+	private BroadcastReceiver weatherReceiver;
+	@Override
+	public void onWeatherChanged(WeatherInfo info) 
+	{
+		this.weatherInfo = info;
+		tv_weather.setText("" + info.curr_temp +"℃");
+		image_weather.setImageResource(WeatherUtils.GetWeatherIcon(info.weatherid));
+	}
 	
 	
-	/* MSG_INDEX */
-	private static final int MSG_SPEEDUPDATE = 0;
-	private static final int MSG_TIMEUPDATE = 1;
-	private static final int MSG_LOCDESUPDATE = 2;
-	
+	private BroadcastReceiver locationReceiver;
 	@Override
 	public void onLocationChanged(LocDesc locDesc, SpeedInfo speedInfo)
 	{
@@ -169,24 +188,30 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 		public void onClickMapPoi(MapPoi arg0) {}
 	};
 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		//注意：请在试用setContentView前初始化BMapManager对象，否则会报错  
 		mBMapMan=new BMapManager(getApplicationContext());  
-		mBMapMan.init("F0488f2ee7d14e2bba215419efb9bff3", null);    
+		mBMapMan.init(BDUtils.KEY, null);    
 		
 		
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_speed);
 		
 		//===
+		image_weather = (ImageButton)findViewById(R.id.image_weather);
+		tv_weather = (TextView)findViewById(R.id.tv_weather);
 		tv_speedx = (TextView)findViewById(R.id.tv_speedx);
 		tv_speedy = (TextView)findViewById(R.id.tv_speedy);
 		tv_speedsel = (TextView)findViewById(R.id.tv_speedsel);
 		tv_speedunit = (TextView)findViewById(R.id.tv_speedunit);
 		tv_currloc = (TextView)findViewById(R.id.tv_currloc);
 
+		image_weather.setOnClickListener(this);
+		tv_weather.setOnClickListener(this);
+		
 		tv_speedx.setOnClickListener(this);
 		tv_speedy.setOnClickListener(this);
 		tv_speedsel.setOnClickListener(this);
@@ -210,8 +235,8 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 		image_locstatus = (ImageView)findViewById(R.id.image_locstatus);
 		//===
 
-		LocationBroadcast.registerReceiver(this);
-		
+		locationReceiver = LocationBroadcast.registerReceiver(this);
+		weatherReceiver = WeatherBroadcast.registerReceiver(this);
 		
 		mMapView=(MapView)findViewById(R.id.bdmapview);  
 		mMapView.setBuiltInZoomControls(true);
@@ -222,7 +247,7 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 		GeoPoint point =new GeoPoint((int)(39.915* 1E6),(int)(116.404* 1E6));  
 		//用给定的经纬度构造一个GeoPoint，单位是微度 (度 * 1E6)  
 		mMapController.setCenter(point);//设置地图中心点  
-		mMapController.setZoom(12);//设置地图zoom级别  
+		mMapController.setZoom(15);//设置地图zoom级别  
 		
 		mMapView.regMapViewListener(mBMapMan, mKMapViewListener);
 		
@@ -234,7 +259,6 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 	    myLocationOverlay.setData(locData);
 	    
 	    setLocMode(locationMode);
-		myLocationOverlay.enableCompass();
 
 		//添加定位图层
 		mMapView.getOverlays().add(myLocationOverlay);
@@ -272,14 +296,9 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 	
 	@Override
 	protected void onDestroy() {
-		 mMapView.destroy();  
-	        if(mBMapMan!=null){  
-	                mBMapMan.destroy();  
-	                mBMapMan=null;  
-	        }  
-	        
-	    LocationBroadcast.unRegisterReceiver(this);
+		Log.e(TAG, "onDestroy");
 		super.onDestroy();
+//		System.exit(0);
 	}
 	
 	private static enum SpeedSelEnum
@@ -305,6 +324,12 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 		}
 		
 	}
+	
+	/* MSG_INDEX */
+	private static final int MSG_SPEEDUPDATE = 0;
+	private static final int MSG_TIMEUPDATE = 1;
+	private static final int MSG_LOCDESUPDATE = 2;
+	
 	private static class MainActHandler extends Handler 
 	{
 		private WeakReference<SpeedActivity> activity = null;
@@ -385,10 +410,17 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 	
 	@Override
 	public void onBackPressed() {
-		this.finish();
-		super.onBackPressed();
 		LocationService.stopLocationService(this);
-		System.exit(0);
+		LocationBroadcast.unRegisterReceiver(this, locationReceiver);
+		WeatherBroadcast.unRegisterReceiver(this, weatherReceiver);
+		
+		 mMapView.destroy();  
+	        if(mBMapMan!=null){  
+	                mBMapMan.destroy();  
+	                mBMapMan=null;  
+	        }
+		
+		this.finish();
 	}
 
 	@Override
@@ -396,6 +428,22 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 	{
 		switch (v.getId())
 		{
+		case R.id.image_weather:
+		case R.id.tv_weather:
+		{
+			if (weatherInfo != null)
+			{
+				Toast.makeText(this, weatherInfo.toString(), Toast.LENGTH_SHORT).show();
+			}else
+			{
+				Toast.makeText(this, R.string.weather_no_info, Toast.LENGTH_SHORT).show();
+			}
+			
+			break;
+		}
+		
+		
+		
 		case R.id.tv_speedx:
 		case R.id.tv_speedy:
 		case R.id.tv_speedsel:
@@ -412,6 +460,7 @@ public class SpeedActivity extends Activity implements OnClickListener, Location
 			if (mMapController != null && locData != null)
 			{
 				mMapController.animateTo(new GeoPoint((int)(locData.latitude* 1e6), (int)(locData.longitude *  1e6)));
+				mMapController.setRotation(1);
 			}
 			break;
 		}

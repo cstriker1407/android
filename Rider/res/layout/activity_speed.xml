@@ -16,31 +16,30 @@
 
         <TextView
             android:id="@+id/tv_speedsel"
-            android:layout_width="fill_parent"
-            android:layout_height="55dp"
-            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/tv_speedx"
             android:gravity="center"
             android:text="AVG"
-            android:textSize="35dp" />
+            android:textSize="20dp" />
         <TextView
             android:id="@+id/tv_speedunit"
             android:layout_width="fill_parent"
             android:layout_height="20dp"
             android:layout_alignParentRight="true"
+            android:layout_above="@+id/tv_speedy"
             android:layout_toRightOf="@+id/tv_speedx"
             android:gravity="center_horizontal|left"
             android:text="KM/H"
-             android:layout_below="@+id/tv_speedsel"
             android:textSize="20dp" />
 
         <TextView
             android:id="@+id/tv_speedy"
             android:layout_width="fill_parent"
             android:layout_height="75dp"
+            android:layout_alignBottom="@+id/tv_speedx"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/tv_speedunit"
             android:layout_toRightOf="@+id/tv_speedx"
             android:gravity="center_horizontal|left"
             android:text="00"
@@ -113,5 +112,24 @@
             android:gravity="center"
             android:textSize="20dp"/>
 
+        <ImageButton
+            android:id="@+id/image_weather"
+            android:layout_width="50dp"
+            android:layout_height="35dp"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/tv_weather"
+            android:background="@android:color/transparent"
+            android:src="@drawable/weather_01" 
+            android:scaleType="fitXY"/>
+
+        <TextView
+            android:id="@+id/tv_weather"
+            android:layout_width="80dp"
+            android:layout_height="35dp"
+                        android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+
+            android:text="19°C"
+            android:textSize="30dp" />
 
 </RelativeLayout>
