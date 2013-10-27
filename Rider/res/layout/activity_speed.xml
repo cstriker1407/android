@@ -99,18 +99,6 @@
             android:layout_below="@+id/btn_switchlocmode"
             android:layout_marginTop="45dp"
             android:src="@drawable/loc_fail" />
-        
-
-        <TextView
-            android:id="@+id/tv_currloc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/bdmapview"
-            android:text="TextView" 
-            android:gravity="center"
-            android:textSize="20dp"/>
 
         <ImageButton
             android:id="@+id/image_weather"
@@ -126,10 +114,47 @@
             android:id="@+id/tv_weather"
             android:layout_width="80dp"
             android:layout_height="35dp"
-                        android:layout_alignParentRight="true"
+            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-
             android:text="19°C"
             android:textSize="30dp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/bdmapview"
+            android:background="@android:color/black" 
+            >
+
+            <Button
+                android:id="@+id/btn_mapenable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/btn_mapenable" 
+                android:layout_gravity="left"
+                 android:layout_weight="2"
+                />
+            <Button
+                android:id="@+id/btn_posquery"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/btn_posquery" 
+                 android:layout_weight="2"/>
+            <Button
+                android:id="@+id/btn_morefun"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/btn_morefun"
+                android:layout_weight="2"/>
+            <Button
+                android:id="@+id/btn_quit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/btn_quit"
+                android:layout_weight="2" />
+
+        </LinearLayout>
+        
 </RelativeLayout>

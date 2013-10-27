@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -62,11 +63,18 @@ WeatherBroadcast.onWeatherChangedListener
 	private TextView tv_speedunit;
 	private TextView tv_totaldistance;
 	private TextView tv_currtime;
-	private TextView tv_currloc;
 	
 	private ImageButton btn_gotomypos;
 	private ImageButton btn_switchlocmode;
 	private ImageView   image_locstatus;
+	
+	
+	private Button btn_mapenable;
+	private Button btn_posquery;
+	private Button btn_morefun;
+	private Button btn_quit;
+	
+	
 	
 	private MainActHandler handler = new MainActHandler(this);
 	private SpeedSelEnum speedSelEnum = SpeedSelEnum.CUR;
@@ -207,7 +215,6 @@ WeatherBroadcast.onWeatherChangedListener
 		tv_speedy = (TextView)findViewById(R.id.tv_speedy);
 		tv_speedsel = (TextView)findViewById(R.id.tv_speedsel);
 		tv_speedunit = (TextView)findViewById(R.id.tv_speedunit);
-		tv_currloc = (TextView)findViewById(R.id.tv_currloc);
 
 		image_weather.setOnClickListener(this);
 		tv_weather.setOnClickListener(this);
@@ -233,6 +240,17 @@ WeatherBroadcast.onWeatherChangedListener
 		btn_switchlocmode.setOnClickListener(this);
 		
 		image_locstatus = (ImageView)findViewById(R.id.image_locstatus);
+		
+		
+		btn_mapenable = (Button)findViewById(R.id.btn_mapenable);
+		btn_posquery = (Button)findViewById(R.id.btn_posquery);
+		btn_morefun = (Button)findViewById(R.id.btn_morefun);
+		btn_quit = (Button)findViewById(R.id.btn_quit);
+		
+		btn_mapenable.setOnClickListener(this);
+		btn_posquery.setOnClickListener(this);
+		btn_morefun.setOnClickListener(this);
+		btn_quit.setOnClickListener(this);
 		//===
 
 		locationReceiver = LocationBroadcast.registerReceiver(this);
@@ -358,7 +376,6 @@ WeatherBroadcast.onWeatherChangedListener
 				{
 					Locations.LocDesc locDesc = (Locations.LocDesc)msg.obj;
 					act.image_locstatus.setImageResource(locDesc.typeEnum.getImageId());
-					act.tv_currloc.setText(locDesc.locAddr);
 					break;
 				}
 				
@@ -408,19 +425,26 @@ WeatherBroadcast.onWeatherChangedListener
 	}
 
 	
-	@Override
-	public void onBackPressed() {
+	private void quitApp()
+	{
+		Log.e(TAG, "!! QUIT APP CALLED !!");
 		LocationService.stopLocationService(this);
 		LocationBroadcast.unRegisterReceiver(this, locationReceiver);
 		WeatherBroadcast.unRegisterReceiver(this, weatherReceiver);
-		
 		 mMapView.destroy();  
-	        if(mBMapMan!=null){  
-	                mBMapMan.destroy();  
-	                mBMapMan=null;  
-	        }
-		
+		if (mBMapMan != null) 
+		{
+			mBMapMan.destroy();
+			mBMapMan = null;
+		}
 		this.finish();
+	}
+	
+	
+	@Override
+	public void onBackPressed() 
+	{
+		// do nth
 	}
 
 	@Override
@@ -441,8 +465,6 @@ WeatherBroadcast.onWeatherChangedListener
 			
 			break;
 		}
-		
-		
 		
 		case R.id.tv_speedx:
 		case R.id.tv_speedy:
@@ -489,6 +511,23 @@ WeatherBroadcast.onWeatherChangedListener
 			break;
 		}
 		
+		case R.id.btn_mapenable:
+		{
+			break;
+		}
+		case R.id.btn_posquery:
+		{
+			break;
+		}
+		case R.id.btn_morefun:
+		{
+			break;
+		}
+		case R.id.btn_quit:
+		{
+			quitApp();
+			break;
+		}
 		default:
 			break;
 		}

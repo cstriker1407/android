@@ -5,4 +5,10 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
  	<string name="weather_no_info">天气正在查询，请稍后</string>
+ 	<string name="btn_mapenable">地图开关</string>
+ 	<string name="btn_posquery">位置查询</string>
+ 	<string name="btn_morefun">更多功能</string>
+ 	<string name="btn_quit">退出</string>
+ 	
+ 	
 </resources>
