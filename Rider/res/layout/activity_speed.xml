@@ -7,12 +7,13 @@
         <TextView
             android:id="@+id/tv_speedx"
             android:layout_width="220dp"
-            android:layout_height="150dp"
+            android:layout_height="160dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:layout_marginTop="25dp"
             android:gravity="bottom|center"
             android:text="00"
-            android:textSize="150dp" />
+            android:textSize="185dp" />
 
         <TextView
             android:id="@+id/tv_speedsel"
@@ -22,7 +23,7 @@
             android:layout_alignParentTop="true"
             android:gravity="center"
             android:text="AVG"
-            android:textSize="20dp" />
+            android:textSize="30dp" />
         <TextView
             android:id="@+id/tv_speedunit"
             android:layout_width="fill_parent"
@@ -32,18 +33,19 @@
             android:layout_toRightOf="@+id/tv_speedx"
             android:gravity="center_horizontal|left"
             android:text="KM/H"
-            android:textSize="20dp" />
+            android:textSize="30dp" />
 
         <TextView
             android:id="@+id/tv_speedy"
             android:layout_width="fill_parent"
             android:layout_height="75dp"
-            android:layout_alignBottom="@+id/tv_speedx"
             android:layout_alignParentRight="true"
+            android:layout_above="@+id/tv_totaldistance"
+            android:layout_marginBottom="20dp"
             android:layout_toRightOf="@+id/tv_speedx"
             android:gravity="center_horizontal|left"
             android:text="00"
-            android:textSize="50dp" />
+            android:textSize="70dp" />
 
         <TextView
             android:id="@+id/tv_totaldistance"
@@ -54,7 +56,8 @@
             android:layout_below="@+id/tv_speedx"
             android:text="000.000KM/00:00:00"
             android:gravity="center"
-            android:textSize="35dp" />
+            android:textSize="35dp" 
+            android:layout_marginTop="-25dp"/>
 
         <TextView
             android:id="@+id/tv_currtime"
@@ -102,8 +105,8 @@
 
         <ImageButton
             android:id="@+id/image_weather"
-            android:layout_width="50dp"
-            android:layout_height="35dp"
+            android:layout_width="47dp"
+            android:layout_height="33dp"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/tv_weather"
             android:background="@android:color/transparent"
