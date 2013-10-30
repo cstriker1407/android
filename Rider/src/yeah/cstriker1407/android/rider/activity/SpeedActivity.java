@@ -29,9 +29,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,6 +91,12 @@ WeatherBroadcast.onWeatherChangedListener
 	private MyLocationOverlay myLocationOverlay = null; 
 	private LocationData locData = null;
 	private LocationMode locationMode = LocationMode.COMPASS;
+	
+	
+	private RelativeLayout bdMapLayout;
+	private ImageView image_zhinanzhen;
+	private boolean bdMapVisible = true;/* 默认打开百度地图 */
+	private float currentDegree=0f;
 
 	private void setLocMode(LocationMode locMode)
 	{
@@ -153,14 +162,30 @@ WeatherBroadcast.onWeatherChangedListener
 		locDescMsg.what = MSG_LOCDESUPDATE;
 		locDescMsg.obj = locDesc;
 		handler.sendMessage(locDescMsg);
-
-		Log.d(TAG, locDesc.toString());
-
+		
+		if (bdMapVisible)
+		{
+			refreshDBMapLocation(locDesc);
+		}else
+		{
+			float degree = locDesc.direction;
+	        RotateAnimation ra=new RotateAnimation(currentDegree,-degree,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);  
+	        ra.setDuration(200);
+	        ra.setFillAfter(true);
+	        image_zhinanzhen.startAnimation(ra);  
+	        currentDegree=-degree;  
+		}
+		
 		Message speedInfoMsg = new Message();
 		speedInfoMsg.what = MSG_SPEEDUPDATE;
 		speedInfoMsg.obj = speedInfo;
 		handler.sendMessage(speedInfoMsg);
 
+		Log.d(TAG, locDesc.toString());
+		Log.d(TAG, speedInfo.toString());
+	}
+
+	private void refreshDBMapLocation(LocDesc locDesc) {
 		locData.latitude = locDesc.latitude;
 		locData.longitude = locDesc.longitude;
 		// 如果不显示定位精度圈，将accuracy赋值为0即可
@@ -170,10 +195,6 @@ WeatherBroadcast.onWeatherChangedListener
 		myLocationOverlay.setData(locData);
 		// 更新图层数据执行刷新后生效
 		mMapView.refresh();
-		// 移动到定位点
-		/* 在罗盘和跟随模式下，地图会自动的animate到最新的位置，在普通模式下，不会。 */
-		// mMapController.animateTo(new GeoPoint((int)(locData.latitude* 1e6),
-		// (int)(locData.longitude * 1e6)));
 	}
 	
 	private MKMapViewListener mKMapViewListener = new MKMapViewListener() {
@@ -204,7 +225,6 @@ WeatherBroadcast.onWeatherChangedListener
 		//注意：请在试用setContentView前初始化BMapManager对象，否则会报错  
 		mBMapMan=new BMapManager(getApplicationContext());  
 		mBMapMan.init(BDUtils.KEY, null);    
-		
 		
 		setContentView(R.layout.activity_speed);
 		
@@ -251,11 +271,23 @@ WeatherBroadcast.onWeatherChangedListener
 		btn_posquery.setOnClickListener(this);
 		btn_morefun.setOnClickListener(this);
 		btn_quit.setOnClickListener(this);
+		
+		image_zhinanzhen = (ImageView)findViewById(R.id.image_zhinanzhen);
+		image_zhinanzhen.setVisibility(View.INVISIBLE);
+		bdMapLayout = (RelativeLayout)findViewById(R.id.bdmaplayout);
+		
+		
 		//===
 
 		locationReceiver = LocationBroadcast.registerReceiver(this);
 		weatherReceiver = WeatherBroadcast.registerReceiver(this);
 		
+		initBDMapSettings();
+		
+		handler.sendEmptyMessage(MSG_TIMEUPDATE);
+	}
+
+	private void initBDMapSettings() {
 		mMapView=(MapView)findViewById(R.id.bdmapview);  
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.showScaleControl(true);
@@ -282,36 +314,42 @@ WeatherBroadcast.onWeatherChangedListener
 		mMapView.getOverlays().add(myLocationOverlay);
 		//修改定位数据后刷新图层生效
 		mMapView.refresh();
-		
-		
-		handler.sendEmptyMessage(MSG_TIMEUPDATE);
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+	private void resumeBDMap() {
+		mMapView.onResume();  
+		if(mBMapMan!=null){  
+		        mBMapMan.start();  
+		}
 	}
-	
+	private void pauseBDMap() {
+		mMapView.onPause();  
+		if(mBMapMan!=null){  
+		       mBMapMan.stop();  
+		}
+	}  
+	private void destroyBDMap() {
+		mMapView.destroy();  
+		if (mBMapMan != null) 
+		{
+			mBMapMan.destroy();
+			mBMapMan = null;
+		}
+	}
+
 	@Override  
 	protected void onResume(){  
-	        mMapView.onResume();  
-	        if(mBMapMan!=null){  
-	                mBMapMan.start();  
-	        }  
+	        resumeBDMap();  
 	       super.onResume();  
 	}
 
 	@Override  
 	protected void onPause(){  
-	        mMapView.onPause();  
-	        if(mBMapMan!=null){  
-	               mBMapMan.stop();  
-	        }  
+	        pauseBDMap();  
 	        super.onPause();  
-	}  
-	
+	}
+
+
 	@Override
 	protected void onDestroy() {
 		Log.e(TAG, "onDestroy");
@@ -431,16 +469,10 @@ WeatherBroadcast.onWeatherChangedListener
 		LocationService.stopLocationService(this);
 		LocationBroadcast.unRegisterReceiver(this, locationReceiver);
 		WeatherBroadcast.unRegisterReceiver(this, weatherReceiver);
-		 mMapView.destroy();  
-		if (mBMapMan != null) 
-		{
-			mBMapMan.destroy();
-			mBMapMan = null;
-		}
+		destroyBDMap();
 		this.finish();
 	}
-	
-	
+
 	@Override
 	public void onBackPressed() 
 	{
@@ -513,6 +545,21 @@ WeatherBroadcast.onWeatherChangedListener
 		
 		case R.id.btn_mapenable:
 		{
+			if (bdMapVisible)
+			{
+				image_zhinanzhen.setVisibility(View.VISIBLE);
+				bdMapLayout.setVisibility(View.INVISIBLE);
+				pauseBDMap();
+			}else
+			{
+				currentDegree = 0;
+				image_zhinanzhen.clearAnimation();
+				image_zhinanzhen.setVisibility(View.INVISIBLE);
+				bdMapLayout.setVisibility(View.VISIBLE);
+				resumeBDMap();
+			}
+			bdMapVisible = !bdMapVisible;
+
 			break;
 		}
 		case R.id.btn_posquery:

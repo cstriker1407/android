@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bdmaplayout"
+    android:layout_width="match_parent"
+    android:layout_height="250dp" >
+         <com.baidu.mapapi.map.MapView
+	        android:id="@+id/bdmapview"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:clickable="true" />
+        <ImageButton
+            android:id="@+id/btn_gotomypos"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/bdmapview"
+            android:src="@drawable/gotomypos" 
+            />
+        
+		<ImageButton
+            android:id="@+id/btn_switchlocmode"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/btn_gotomypos"
+            android:src="@drawable/compass" />
+		
+		<ImageView
+            android:id="@+id/image_locstatus"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/btn_switchlocmode"
+            android:layout_marginTop="45dp"
+            android:src="@drawable/loc_fail" />
+
+</RelativeLayout>

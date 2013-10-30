@@ -4,160 +4,141 @@
     android:layout_height="match_parent"
     tools:context=".SpeedActivity" >
 
-        <TextView
-            android:id="@+id/tv_speedx"
-            android:layout_width="220dp"
-            android:layout_height="160dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="25dp"
-            android:gravity="bottom|center"
-            android:text="00"
-            android:textSize="185dp" />
+    <TextView
+        android:id="@+id/tv_speedx"
+        android:layout_width="220dp"
+        android:layout_height="160dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="25dp"
+        android:gravity="bottom|center"
+        android:text="00"
+        android:textSize="185dp" />
 
-        <TextView
-            android:id="@+id/tv_speedsel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:gravity="center"
-            android:text="AVG"
-            android:textSize="30dp" />
-        <TextView
-            android:id="@+id/tv_speedunit"
-            android:layout_width="fill_parent"
-            android:layout_height="20dp"
-            android:layout_alignParentRight="true"
-            android:layout_above="@+id/tv_speedy"
-            android:layout_toRightOf="@+id/tv_speedx"
-            android:gravity="center_horizontal|left"
-            android:text="KM/H"
-            android:textSize="30dp" />
+    <TextView
+        android:id="@+id/tv_speedsel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="AVG"
+        android:textSize="30dp" />
 
-        <TextView
-            android:id="@+id/tv_speedy"
-            android:layout_width="fill_parent"
-            android:layout_height="75dp"
-            android:layout_alignParentRight="true"
-            android:layout_above="@+id/tv_totaldistance"
-            android:layout_marginBottom="20dp"
-            android:layout_toRightOf="@+id/tv_speedx"
-            android:gravity="center_horizontal|left"
-            android:text="00"
-            android:textSize="70dp" />
+    <TextView
+        android:id="@+id/tv_speedunit"
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:layout_above="@+id/tv_speedy"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/tv_speedx"
+        android:gravity="center_horizontal|left"
+        android:text="KM/H"
+        android:textSize="30dp" />
 
-        <TextView
-            android:id="@+id/tv_totaldistance"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/tv_speedx"
-            android:text="000.000KM/00:00:00"
-            android:gravity="center"
-            android:textSize="35dp" 
-            android:layout_marginTop="-25dp"/>
+    <TextView
+        android:id="@+id/tv_speedy"
+        android:layout_width="fill_parent"
+        android:layout_height="75dp"
+        android:layout_above="@+id/tv_totaldistance"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="20dp"
+        android:layout_toRightOf="@+id/tv_speedx"
+        android:gravity="center_horizontal|left"
+        android:text="00"
+        android:textSize="70dp" />
 
-        <TextView
-            android:id="@+id/tv_currtime"
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/tv_totaldistance"
-            android:text="2013.10.17 11:25:25 PM"
-            android:gravity="center"
-            android:textSize="25dp" />
-        
-        <com.baidu.mapapi.map.MapView
-	        android:id="@+id/bdmapview"
-	        android:layout_below="@+id/tv_currtime"
-	        android:layout_width="fill_parent"
-	        android:layout_height="250dp"
-	        android:clickable="true" />
-       
-        <ImageButton
-            android:id="@+id/btn_gotomypos"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/bdmapview"
-            android:src="@drawable/gotomypos" 
-            />
-        
-		<ImageButton
-            android:id="@+id/btn_switchlocmode"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/btn_gotomypos"
-            android:src="@drawable/compass" />
-		
-		<ImageView
-            android:id="@+id/image_locstatus"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/btn_switchlocmode"
-            android:layout_marginTop="45dp"
-            android:src="@drawable/loc_fail" />
+    <TextView
+        android:id="@+id/tv_totaldistance"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tv_speedx"
+        android:layout_marginTop="-25dp"
+        android:gravity="center"
+        android:text="000.000KM/00:00:00"
+        android:textSize="35dp" />
 
-        <ImageButton
-            android:id="@+id/image_weather"
-            android:layout_width="47dp"
-            android:layout_height="33dp"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/tv_weather"
-            android:background="@android:color/transparent"
-            android:src="@drawable/weather_01" 
-            android:scaleType="fitXY"/>
+    <TextView
+        android:id="@+id/tv_currtime"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tv_totaldistance"
+        android:gravity="center"
+        android:text="2013.10.17 11:25:25 PM"
+        android:textSize="25dp" />
 
-        <TextView
-            android:id="@+id/tv_weather"
-            android:layout_width="80dp"
-            android:layout_height="35dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:text="19°C"
-            android:textSize="30dp" />
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_below="@+id/tv_currtime"
+        layout="@layout/bdmap" />
 
-        <LinearLayout
+    <ImageButton
+        android:id="@+id/image_weather"
+        android:layout_width="47dp"
+        android:layout_height="33dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/tv_weather"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@drawable/weather_01" />
+
+    <TextView
+        android:id="@+id/tv_weather"
+        android:layout_width="80dp"
+        android:layout_height="35dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="19°C"
+        android:textSize="30dp" />
+
+    <ImageView
+        android:id="@+id/image_zhinanzhen"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/tv_currtime"
+        android:scaleType="fitXY"
+        android:src="@drawable/zhinanzhen"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/black" >
+
+        <Button
+            android:id="@+id/btn_mapenable"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@+id/bdmapview"
-            android:background="@android:color/black" 
-            >
+            android:layout_gravity="left"
+            android:layout_weight="2"
+            android:text="@string/btn_mapenable" />
 
-            <Button
-                android:id="@+id/btn_mapenable"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/btn_mapenable" 
-                android:layout_gravity="left"
-                 android:layout_weight="2"
-                />
-            <Button
-                android:id="@+id/btn_posquery"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/btn_posquery" 
-                 android:layout_weight="2"/>
-            <Button
-                android:id="@+id/btn_morefun"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/btn_morefun"
-                android:layout_weight="2"/>
-            <Button
-                android:id="@+id/btn_quit"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/btn_quit"
-                android:layout_weight="2" />
+        <Button
+            android:id="@+id/btn_posquery"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="@string/btn_posquery" />
 
-        </LinearLayout>
-        
+        <Button
+            android:id="@+id/btn_morefun"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="@string/btn_morefun" />
+
+        <Button
+            android:id="@+id/btn_quit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="@string/btn_quit" />
+    </LinearLayout>
+
 </RelativeLayout>
