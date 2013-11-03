@@ -9,6 +9,10 @@
  	<string name="btn_posquery">位置查询</string>
  	<string name="btn_morefun">更多功能</string>
  	<string name="btn_quit">退出</string>
+ 	<string name="msg_surequit">确认退出吗？</string>
+ 	<string name="btn_cancel">取消</string>
  	
- 	
+ 	<string name="btn_beginride">开始骑行</string>
+    <string name="btn_ridestat">行程统计</string>
+    <string name="btn_setting">软件设置</string>
 </resources>

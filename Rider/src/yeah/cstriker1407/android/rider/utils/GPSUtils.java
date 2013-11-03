@@ -1,5 +1,8 @@
 package yeah.cstriker1407.android.rider.utils;
 
+import com.baidu.mapapi.utils.DistanceUtil;
+import com.baidu.platform.comapi.basestruct.GeoPoint;
+
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -32,5 +35,12 @@ public class GPSUtils
 		float [] result = new float[]{-1f,0f,0f};
 		Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, result);
 		return result[0];
+	}
+	
+	/* ·µ»ØÃ× */
+	public static float calcDistanceByBD(double startLatitude, double startLongitude, double endLatitude, double endLongitude)
+	{
+		return (float)DistanceUtil.getDistance(new GeoPoint((int)(startLatitude * 1e6), (int)(startLongitude * 1e6)), 
+										new GeoPoint((int)(endLatitude * 1e6), (int) (endLongitude * 1e6)));
 	}
 }

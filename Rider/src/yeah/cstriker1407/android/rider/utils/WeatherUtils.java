@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class WeatherUtils
 {
-	public static final int WEATHER_SPAN = 5 * 1000;
+	public static final int WEATHER_SPAN = 60* 60 * 1000;
 	
 	public static final String URL_Service = "http://www.weather.com.cn/data/sk/101190101.html";
 //	public static final String URL_Activity = "http://www.weather.com.cn/data/cityinfo/101190101.html";

@@ -17,6 +17,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -49,11 +50,20 @@ public class LocationService extends Service implements onHttpResultListener
 		context.stopService(new Intent(context, LocationService.class));
 	}
 	
+	private LocationBinder binder = new LocationBinder();
+	public class LocationBinder extends Binder
+	{
+		public void sendWeatherReq()
+		{
+			LocationService.this.sendWeatherReq();
+		}
+	}
+	
 	private static final String TAG = "LocationService";
 	
 	@Override
 	public IBinder onBind(Intent intent) {
-		return null;
+		return binder;
 	}
 
 	@Override
@@ -90,7 +100,6 @@ public class LocationService extends Service implements onHttpResultListener
 	
 	
 	//---------百度定位相关函数--------//
-		
 	private LocationClient mLocationClient = null;
 	private BDLocationListener bdLocationListener = new BDLocationListener() {
 		@Override
@@ -242,8 +251,6 @@ public class LocationService extends Service implements onHttpResultListener
 			Log.d(TAG, info.toString());
 			WeatherBroadcast.sendBroadcast(this, info);
 		}
-		
-		
 	}
     
 }

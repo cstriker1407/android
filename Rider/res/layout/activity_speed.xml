@@ -2,7 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SpeedActivity" >
+    android:keepScreenOn="true"
+    tools:context=".SpeedActivity"
+    android:id="@+id/root_speed"
+     >
 
     <TextView
         android:id="@+id/tv_speedx"

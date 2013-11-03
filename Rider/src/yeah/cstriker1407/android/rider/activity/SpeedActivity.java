@@ -3,8 +3,6 @@ package yeah.cstriker1407.android.rider.activity;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 
-import org.w3c.dom.Text;
-
 import yeah.cstriker1407.android.rider.R;
 import yeah.cstriker1407.android.rider.receiver.LocationBroadcast;
 import yeah.cstriker1407.android.rider.receiver.WeatherBroadcast;
@@ -12,36 +10,43 @@ import yeah.cstriker1407.android.rider.service.LocationService;
 import yeah.cstriker1407.android.rider.storage.Bitmaps;
 import yeah.cstriker1407.android.rider.storage.Locations;
 import yeah.cstriker1407.android.rider.storage.Locations.LocDesc;
-import yeah.cstriker1407.android.rider.storage.Locations.LocDesc.LocTypeEnum;
 import yeah.cstriker1407.android.rider.storage.Locations.SpeedInfo;
 import yeah.cstriker1407.android.rider.utils.BDUtils;
 import yeah.cstriker1407.android.rider.utils.TimeUtils;
 import yeah.cstriker1407.android.rider.utils.WeatherUtils;
 import yeah.cstriker1407.android.rider.utils.WeatherUtils.WeatherInfo;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
-import android.view.Menu;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.BMapManager;
 import com.baidu.mapapi.map.LocationData;
 import com.baidu.mapapi.map.MKMapViewListener;
@@ -50,6 +55,16 @@ import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationOverlay;
 import com.baidu.mapapi.map.MyLocationOverlay.LocationMode;
+import com.baidu.mapapi.search.MKAddrInfo;
+import com.baidu.mapapi.search.MKBusLineResult;
+import com.baidu.mapapi.search.MKDrivingRouteResult;
+import com.baidu.mapapi.search.MKPoiResult;
+import com.baidu.mapapi.search.MKSearch;
+import com.baidu.mapapi.search.MKSearchListener;
+import com.baidu.mapapi.search.MKShareUrlResult;
+import com.baidu.mapapi.search.MKSuggestionResult;
+import com.baidu.mapapi.search.MKTransitRouteResult;
+import com.baidu.mapapi.search.MKWalkingRouteResult;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
 
 public class SpeedActivity extends Activity implements OnClickListener, LocationBroadcast.onLocationChangedListener,
@@ -77,6 +92,7 @@ WeatherBroadcast.onWeatherChangedListener
 	private Button btn_morefun;
 	private Button btn_quit;
 	
+	private PopupWindow popupWindow = null;
 	
 	
 	private MainActHandler handler = new MainActHandler(this);
@@ -91,6 +107,10 @@ WeatherBroadcast.onWeatherChangedListener
 	private MyLocationOverlay myLocationOverlay = null; 
 	private LocationData locData = null;
 	private LocationMode locationMode = LocationMode.COMPASS;
+	
+	private MKSearch mSearch = null;
+	
+	
 	
 	
 	private RelativeLayout bdMapLayout;
@@ -151,6 +171,13 @@ WeatherBroadcast.onWeatherChangedListener
 		this.weatherInfo = info;
 		tv_weather.setText("" + info.curr_temp +"℃");
 		image_weather.setImageResource(WeatherUtils.GetWeatherIcon(info.weatherid));
+		if (weatherInfo != null)
+		{
+			Toast.makeText(this, weatherInfo.toString(), Toast.LENGTH_SHORT).show();
+		}else
+		{
+			Toast.makeText(this, R.string.weather_no_info, Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 	
@@ -216,8 +243,49 @@ WeatherBroadcast.onWeatherChangedListener
 		@Override
 		public void onClickMapPoi(MapPoi arg0) {}
 	};
+	private MKSearchListener mkSearchListener = new MKSearchListener() {
+		@Override
+		public void onGetWalkingRouteResult(MKWalkingRouteResult arg0, int arg1) {}
+		
+		@Override
+		public void onGetTransitRouteResult(MKTransitRouteResult arg0, int arg1) {}
+		
+		@Override
+		public void onGetSuggestionResult(MKSuggestionResult arg0, int arg1) {}
+		
+		@Override
+		public void onGetShareUrlResult(MKShareUrlResult arg0, int arg1, int arg2) {}
+		
+		@Override
+		public void onGetPoiResult(MKPoiResult arg0, int arg1, int arg2) {}
+		
+		@Override
+		public void onGetPoiDetailSearchResult(int arg0, int arg1) {}
+		
+		@Override
+		public void onGetDrivingRouteResult(MKDrivingRouteResult arg0, int arg1) {}
+		
+		@Override
+		public void onGetBusDetailResult(MKBusLineResult arg0, int arg1) {}
+		
+		@Override
+		public void onGetAddrResult(MKAddrInfo res, int error) {
+			if (error != 0) 
+			{
+				Log.e(TAG, "GEO查询失败：" + error);
+				Toast.makeText(SpeedActivity.this, "查询失败：" + error, Toast.LENGTH_SHORT).show();
+				return;
+			}
+			if (res.type == MKAddrInfo.MK_REVERSEGEOCODE)
+			{
+				String strInfo = res.strAddr;
+				Log.d(TAG, "GEO查询成功：" + strInfo);
+				Toast.makeText(SpeedActivity.this, strInfo, Toast.LENGTH_SHORT).show();
+				return;
+			}
+		}
+	};
 
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -281,6 +349,7 @@ WeatherBroadcast.onWeatherChangedListener
 
 		locationReceiver = LocationBroadcast.registerReceiver(this);
 		weatherReceiver = WeatherBroadcast.registerReceiver(this);
+		bindService();
 		
 		initBDMapSettings();
 		
@@ -298,7 +367,6 @@ WeatherBroadcast.onWeatherChangedListener
 		//用给定的经纬度构造一个GeoPoint，单位是微度 (度 * 1E6)  
 		mMapController.setCenter(point);//设置地图中心点  
 		mMapController.setZoom(15);//设置地图zoom级别  
-		
 		mMapView.regMapViewListener(mBMapMan, mKMapViewListener);
 		
 		
@@ -307,13 +375,18 @@ WeatherBroadcast.onWeatherChangedListener
 		myLocationOverlay = new MyLocationOverlay(mMapView);
 		//设置定位数据
 	    myLocationOverlay.setData(locData);
-	    
 	    setLocMode(locationMode);
 
 		//添加定位图层
 		mMapView.getOverlays().add(myLocationOverlay);
 		//修改定位数据后刷新图层生效
 		mMapView.refresh();
+		
+		
+		/* 初始化搜索 */
+		mSearch = new MKSearch();
+		mSearch.init(mBMapMan, mkSearchListener);
+		
 	}
 
 	private void resumeBDMap() {
@@ -466,17 +539,20 @@ WeatherBroadcast.onWeatherChangedListener
 	private void quitApp()
 	{
 		Log.e(TAG, "!! QUIT APP CALLED !!");
-		LocationService.stopLocationService(this);
+		
+		unbindService();
 		LocationBroadcast.unRegisterReceiver(this, locationReceiver);
 		WeatherBroadcast.unRegisterReceiver(this, weatherReceiver);
 		destroyBDMap();
+
+		LocationService.stopLocationService(this);
 		this.finish();
 	}
 
 	@Override
 	public void onBackPressed() 
 	{
-		// do nth
+		showQuitDialog();
 	}
 
 	@Override
@@ -487,14 +563,7 @@ WeatherBroadcast.onWeatherChangedListener
 		case R.id.image_weather:
 		case R.id.tv_weather:
 		{
-			if (weatherInfo != null)
-			{
-				Toast.makeText(this, weatherInfo.toString(), Toast.LENGTH_SHORT).show();
-			}else
-			{
-				Toast.makeText(this, R.string.weather_no_info, Toast.LENGTH_SHORT).show();
-			}
-			
+			sendWeatherReq();
 			break;
 		}
 		
@@ -564,19 +633,116 @@ WeatherBroadcast.onWeatherChangedListener
 		}
 		case R.id.btn_posquery:
 		{
+			GeoPoint ptCenter = new GeoPoint((int)(locData.latitude*1e6), (int)(locData.longitude*1e6));
+			mSearch.reverseGeocode(ptCenter);
 			break;
 		}
 		case R.id.btn_morefun:
 		{
+			showFunPop();
 			break;
 		}
 		case R.id.btn_quit:
 		{
-			quitApp();
+			showQuitDialog();
+			break;
+		}
+		case R.id.btn_beginride:
+		{
+			popupWindow.dismiss();
+			break;
+		}
+		case R.id.btn_ridestat:
+		{
+			popupWindow.dismiss();
+			break;
+		}
+		case R.id.btn_setting:
+		{
+			popupWindow.dismiss();
 			break;
 		}
 		default:
 			break;
+		}
+	}
+	
+	private void showQuitDialog()
+	{
+		new AlertDialog.Builder(this)
+				.setMessage(R.string.msg_surequit)
+				.setPositiveButton(R.string.btn_quit, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) 
+					{
+						SpeedActivity.this.quitApp();
+					}
+				})
+				.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) 
+					{
+						dialog.dismiss();
+					}
+				}).create().show();
+	}
+	
+	private void showFunPop()
+	{
+		View view = View.inflate(this, R.layout.pop_menu, null);
+		Button btn_beginride = (Button)view.findViewById(R.id.btn_beginride);
+		btn_beginride.setOnClickListener(this);
+		Button btn_ridestat = (Button)view.findViewById(R.id.btn_ridestat);
+		btn_ridestat.setOnClickListener(this);
+		Button btn_setting = (Button)view.findViewById(R.id.btn_setting);
+		btn_setting.setOnClickListener(this);
+		
+		popupWindow  = new PopupWindow(view, LayoutParams.MATCH_PARENT, 150, true);
+		popupWindow.setContentView(view);
+		popupWindow.setTouchable(true);
+		popupWindow.setOutsideTouchable(true);
+		popupWindow.setBackgroundDrawable( new BitmapDrawable(getResources(), (Bitmap) null));
+		popupWindow.showAtLocation(findViewById(R.id.root_speed), Gravity.BOTTOM,0, 80);  
+	}
+	
+	
+	//绑定service
+	private ServiceConnection sc = new ServiceConnection() {
+		public void onServiceDisconnected(ComponentName name) 
+		{
+			isBind = false;
+		}
+		public void onServiceConnected(ComponentName name, IBinder service) 
+		{
+			isBind = true;
+			locationBinder = (LocationService.LocationBinder)service;
+		}
+	};
+	private boolean isBind = false; 
+	private LocationService.LocationBinder locationBinder = null;
+
+	private void bindService()
+	{
+		if (!isBind)
+		{
+			bindService(new Intent(SpeedActivity.this, LocationService.class), sc, Context.BIND_AUTO_CREATE); 
+		}
+	}
+	private void unbindService()
+	{
+		if (isBind)
+		{
+			unbindService(sc); 
+		}
+	}
+	private void sendWeatherReq()
+	{
+		if (locationBinder != null)
+		{
+			Log.d(TAG, "查询天气请求已发出");
+			locationBinder.sendWeatherReq();
+		}
+		else
+		{
+			Log.e(TAG, "locationBinder is null");
 		}
 	}
 }
