@@ -10,8 +10,7 @@ public class BaseApp extends Application
 			super.onCreate();
 			
 			SDLog.initLog();
-			
-			SDLog.d("zzz", "test");
+			SDLog.d("", "hello world");
 			
 			Thread.setDefaultUncaughtExceptionHandler(new ThreadCrashHandler("BaseApp"));
 		}
