@@ -23,9 +23,7 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initView();  
-    }  
-    private void initView() { 
+
         viewPager = (ViewPager) findViewById(R.id.viewpager); 
         view1 = View.inflate(this,R.layout.layout1, null);  
         view2 = View.inflate(this,R.layout.layout2, null);  
@@ -66,7 +64,6 @@ public class MainActivity extends Activity
             public Object instantiateItem(ViewGroup container, int position) 
             {
             	Log.d("", "instantiateItem called:" + position);
-            	
             	
             	View view = viewList.get(position % viewList.size());
             	if (view.getTag()== null || view.getTag().toString().equals("remove"))
