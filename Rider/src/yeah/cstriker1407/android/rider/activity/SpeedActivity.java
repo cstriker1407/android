@@ -650,16 +650,25 @@ WeatherBroadcast.onWeatherChangedListener
 		case R.id.btn_beginride:
 		{
 			popupWindow.dismiss();
+			
+			Intent intent = new Intent(this, BeginRideActivity.class);
+			startActivity(intent);
 			break;
 		}
 		case R.id.btn_ridestat:
 		{
 			popupWindow.dismiss();
+			
+			Intent intent = new Intent(this, RideStatActivity.class);
+			startActivity(intent);
 			break;
 		}
 		case R.id.btn_setting:
 		{
 			popupWindow.dismiss();
+			
+			Intent intent = new Intent(this, SettingActivity.class);
+			startActivity(intent);
 			break;
 		}
 		default:

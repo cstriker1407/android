@@ -15,4 +15,14 @@
  	<string name="btn_beginride">开始骑行</string>
     <string name="btn_ridestat">行程统计</string>
     <string name="btn_setting">软件设置</string>
+    
+    <string name="btn_share">定时将位置分享到新浪微博</string>
+    <string name="btn_go">LET\'S GO!!!</string>
+    
+     <string name="msg_currcity">当前定位城市：</string>
+    
+    <string name="btn_lxdt">离线地图</string>
+    <string name="btn_wbzh">微博账号</string>
+    <string name="btn_fxrj">分享软件</string>
+    <string name="btn_aboutme">关于骑行者</string>
 </resources>
