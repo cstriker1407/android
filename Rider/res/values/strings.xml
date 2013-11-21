@@ -25,4 +25,6 @@
     <string name="btn_wbzh">微博账号</string>
     <string name="btn_fxrj">分享软件</string>
     <string name="btn_aboutme">关于骑行者</string>
+    <string name="btn_sharestat">将统计分享到微博</string>
+    <string name="btn_resetstat">重新统计</string>
 </resources>

@@ -2,4 +2,47 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
+
+    <include
+        android:id="@+id/include1"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        layout="@layout/bdmap" 
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"/>
+
+    <FrameLayout
+        android:id="@+id/speed_graph"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@+id/include1" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="SPEED" 
+            android:textSize="100dp"
+            />
+        
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/btn_resetstat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/speed_graph"
+        android:text="@string/btn_resetstat" />
+
+    <Button
+        android:id="@+id/btn_sharestat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/speed_graph"
+        android:layout_toRightOf="@+id/btn_resetstat"
+        android:text="@string/btn_sharestat" />
+
 </RelativeLayout>

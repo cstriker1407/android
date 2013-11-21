@@ -32,14 +32,13 @@ public class Locations
 	private Date startDate = null;//起始的时间
 	
 	public LocDesc getLocDes(String locAddr, double latitude, double longitude,
-			float accuracy, float direction, LocTypeEnum typeEnum)
+			float accuracy, float direction, Date currDate,LocTypeEnum typeEnum)
 	{
-		return new LocDesc(locAddr, latitude, longitude, accuracy, direction, typeEnum);
+		return new LocDesc(locAddr, latitude, longitude, accuracy, direction, currDate,typeEnum);
 	}
 	
-	public SpeedInfo calcSpeedInfo(double latitude, double longitude)
+	public SpeedInfo calcSpeedInfo(Date currDate, double latitude, double longitude)
 	{
-		Date currDate = new Date();
 		if (null == startDate)
 		{//第一次更新位置的时候保存时间
 			startDate = currDate;
@@ -57,7 +56,7 @@ public class Locations
 		{
 			singleSpeedM = (int) (singleDistanceM * 1000 / singleMS);
 		}
-		Log.d(TAG, "distace:" + singleDistanceM + "  ms:" + singleMS + "  speedinM:"+ singleSpeedM);
+//		Log.d(TAG, "distace:" + singleDistanceM + "  ms:" + singleMS + "  speedinM:"+ singleSpeedM);
 		
 		//计算平均速度
 		totalDistanceM += singleDistanceM;
@@ -70,14 +69,14 @@ public class Locations
 		//更新
 		lastLoc.update(latitude, longitude, currDate);
 		
-		return new SpeedInfo(singleSpeedM, 0, 0, averageSpeedM, totalDistanceM, totalMS/1000);
+		return new SpeedInfo(currDate, singleSpeedM, 0, 0, averageSpeedM, totalDistanceM, totalMS/1000);
 	}
 	
 	
 	public static class LocDesc implements Serializable
 	{
-		private static final long serialVersionUID = 1031678267503751481L;
-
+		private static final long serialVersionUID = 5948064472859405460L;
+		
 		public static enum LocTypeEnum
 		{
 			GPS(R.drawable.loc_gps),
@@ -93,36 +92,42 @@ public class Locations
 		};
 		@Deprecated
 		public String locAddr = null;
-		public double latitude = 0;
-		public double longitude = 0;
+		public double latitude = 118;
+		public double longitude = 32;
 		public float accuracy = 0;
 		public float direction = 0;
+		public Date currDate = null;
 		public LocTypeEnum typeEnum = LocTypeEnum.FAIL;
 		
+		public LocDesc()
+		{}
+
 		private LocDesc(String locAddr, double latitude, double longitude,
-				float accuracy, float direction, LocTypeEnum typeEnum) {
+				float accuracy, float direction, Date currDate,
+				LocTypeEnum typeEnum) {
 			super();
 			this.locAddr = locAddr;
 			this.latitude = latitude;
 			this.longitude = longitude;
 			this.accuracy = accuracy;
 			this.direction = direction;
+			this.currDate = currDate;
 			this.typeEnum = typeEnum;
 		}
-
 		@Override
 		public String toString() {
 			return "LocDesc [locAddr=" + locAddr + ", latitude=" + latitude
 					+ ", longitude=" + longitude + ", accuracy=" + accuracy
-					+ ", direction=" + direction + ", typeEnum=" + typeEnum
-					+ "]";
+					+ ", direction=" + direction + ", currDate=" + currDate
+					+ ", typeEnum=" + typeEnum + "]";
 		}
 	}  
 	
 	public static class SpeedInfo implements Serializable
 	{
-		private static final long serialVersionUID = -2575095008092669515L;
+		private static final long serialVersionUID = 6217979544567843027L;
 		
+		public Date currDate = null;
 		public int singleSpeedM = 0;//当前速度 m/s
 		public int maxSpeedM = 0;//最大速度 m/s
 		public int minSpeedM = 0;//最小速度 m/s
@@ -130,9 +135,16 @@ public class Locations
 		public int totalDistanceM = 0;//总里程 m
 		public int totalSeconds = 0;//总时间 s
 		
-		private SpeedInfo(int singleSpeedM, int maxSpeedM, int minSpeedM,
-				int averageSpeedM, int totalDistanceM, int totalSeconds) {
+		public SpeedInfo()
+		{
+			
+		}
+		
+		public SpeedInfo(Date currDate, int singleSpeedM, int maxSpeedM,
+				int minSpeedM, int averageSpeedM, int totalDistanceM,
+				int totalSeconds) {
 			super();
+			this.currDate = currDate;
 			this.singleSpeedM = singleSpeedM;
 			this.maxSpeedM = maxSpeedM;
 			this.minSpeedM = minSpeedM;
@@ -143,10 +155,11 @@ public class Locations
 
 		@Override
 		public String toString() {
-			return "SpeedInfo [singleSpeedM=" + singleSpeedM + ", maxSpeedM="
-					+ maxSpeedM + ", minSpeedM=" + minSpeedM
-					+ ", averageSpeedM=" + averageSpeedM + ", totalDistanceM="
-					+ totalDistanceM + ", totalSeconds=" + totalSeconds + "]";
+			return "SpeedInfo [currDate=" + currDate + ", singleSpeedM="
+					+ singleSpeedM + ", maxSpeedM=" + maxSpeedM
+					+ ", minSpeedM=" + minSpeedM + ", averageSpeedM="
+					+ averageSpeedM + ", totalDistanceM=" + totalDistanceM
+					+ ", totalSeconds=" + totalSeconds + "]";
 		}
 	}
 	

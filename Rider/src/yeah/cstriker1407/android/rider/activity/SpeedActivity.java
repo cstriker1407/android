@@ -4,10 +4,12 @@ import java.lang.ref.WeakReference;
 import java.util.Date;
 
 import yeah.cstriker1407.android.rider.R;
+import yeah.cstriker1407.android.rider.RiderApplication;
 import yeah.cstriker1407.android.rider.receiver.LocationBroadcast;
 import yeah.cstriker1407.android.rider.receiver.WeatherBroadcast;
 import yeah.cstriker1407.android.rider.service.LocationService;
 import yeah.cstriker1407.android.rider.storage.Bitmaps;
+import yeah.cstriker1407.android.rider.storage.DBManager;
 import yeah.cstriker1407.android.rider.storage.Locations;
 import yeah.cstriker1407.android.rider.storage.Locations.LocDesc;
 import yeah.cstriker1407.android.rider.storage.Locations.SpeedInfo;
@@ -26,14 +28,12 @@ import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -101,7 +101,6 @@ WeatherBroadcast.onWeatherChangedListener
 	
 	
 	
-	private BMapManager mBMapMan = null;  
 	private MapView mMapView = null;  
 	private MapController mMapController = null;
 	private MyLocationOverlay myLocationOverlay = null; 
@@ -208,8 +207,8 @@ WeatherBroadcast.onWeatherChangedListener
 		speedInfoMsg.obj = speedInfo;
 		handler.sendMessage(speedInfoMsg);
 
-		Log.d(TAG, locDesc.toString());
-		Log.d(TAG, speedInfo.toString());
+//		Log.d(TAG, locDesc.toString());
+//		Log.d(TAG, speedInfo.toString());
 	}
 
 	private void refreshDBMapLocation(LocDesc locDesc) {
@@ -224,25 +223,6 @@ WeatherBroadcast.onWeatherChangedListener
 		mMapView.refresh();
 	}
 	
-	private MKMapViewListener mKMapViewListener = new MKMapViewListener() {
-		@Override
-		public void onMapMoveFinish() {}
-		
-		@Override
-		public void onMapLoadFinish() {}
-		
-		@Override
-		public void onMapAnimationFinish() {}
-		
-		@Override
-		public void onGetCurrentMap(Bitmap arg0) 
-		{
-			Bitmaps.writeBitmapToFile(arg0, "/mnt/sdcard/map.png");
-		}
-		
-		@Override
-		public void onClickMapPoi(MapPoi arg0) {}
-	};
 	private MKSearchListener mkSearchListener = new MKSearchListener() {
 		@Override
 		public void onGetWalkingRouteResult(MKWalkingRouteResult arg0, int arg1) {}
@@ -289,11 +269,7 @@ WeatherBroadcast.onWeatherChangedListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		//注意：请在试用setContentView前初始化BMapManager对象，否则会报错  
-		mBMapMan=new BMapManager(getApplicationContext());  
-		mBMapMan.init(BDUtils.KEY, null);    
-		
+		Log.e(TAG, "onCreate");
 		setContentView(R.layout.activity_speed);
 		
 		//===
@@ -363,11 +339,12 @@ WeatherBroadcast.onWeatherChangedListener
 		//设置启用内置的缩放控件  
 		mMapController=mMapView.getController();  
 		// 得到mMapView的控制权,可以用它控制和驱动平移和缩放  
-		GeoPoint point =new GeoPoint((int)(39.915* 1E6),(int)(116.404* 1E6));  
+		
+		Locations.LocDesc lastLoc= DBManager.Instance.queryLastLocation();
+		GeoPoint point =new GeoPoint((int)(lastLoc.latitude* 1E6),(int)(lastLoc.longitude* 1E6));  
 		//用给定的经纬度构造一个GeoPoint，单位是微度 (度 * 1E6)  
 		mMapController.setCenter(point);//设置地图中心点  
 		mMapController.setZoom(15);//设置地图zoom级别  
-		mMapView.regMapViewListener(mBMapMan, mKMapViewListener);
 		
 		
         locData = new LocationData();
@@ -385,29 +362,24 @@ WeatherBroadcast.onWeatherChangedListener
 		
 		/* 初始化搜索 */
 		mSearch = new MKSearch();
-		mSearch.init(mBMapMan, mkSearchListener);
+		mSearch.init(RiderApplication.APP.mBMapMan, mkSearchListener);
 		
 	}
 
 	private void resumeBDMap() {
 		mMapView.onResume();  
-		if(mBMapMan!=null){  
-		        mBMapMan.start();  
+		if(RiderApplication.APP.mBMapMan != null){  
+			RiderApplication.APP.mBMapMan.start();  
 		}
 	}
 	private void pauseBDMap() {
 		mMapView.onPause();  
-		if(mBMapMan!=null){  
-		       mBMapMan.stop();  
+		if(RiderApplication.APP.mBMapMan != null){  
+			RiderApplication.APP.mBMapMan.stop();  
 		}
 	}  
 	private void destroyBDMap() {
-		mMapView.destroy();  
-		if (mBMapMan != null) 
-		{
-			mBMapMan.destroy();
-			mBMapMan = null;
-		}
+		mMapView.destroy();
 	}
 
 	@Override  
@@ -495,7 +467,7 @@ WeatherBroadcast.onWeatherChangedListener
 					Locations.SpeedInfo info = (SpeedInfo) msg.obj;
 					if (info != null)
 					{
-						Log.d(TAG, info.toString());
+//						Log.d(TAG, info.toString());
 						
 						float speedM = 0.0f;
 						switch (act.speedSelEnum) 
@@ -536,16 +508,23 @@ WeatherBroadcast.onWeatherChangedListener
 	}
 
 	
-	private void quitApp()
+	private void destroyRes()
 	{
-		Log.e(TAG, "!! QUIT APP CALLED !!");
-		
 		unbindService();
 		LocationBroadcast.unRegisterReceiver(this, locationReceiver);
 		WeatherBroadcast.unRegisterReceiver(this, weatherReceiver);
 		destroyBDMap();
+	}
+	
+	
+	private void quitApp()
+	{
+		Log.e(TAG, "!! QUIT APP CALLED !!");
 
+		destroyRes();
 		LocationService.stopLocationService(this);
+		DBManager.Instance.closeDB();
+//		RiderApplication.APP.mBMapMan.destroy();
 		this.finish();
 	}
 
@@ -658,9 +637,11 @@ WeatherBroadcast.onWeatherChangedListener
 		case R.id.btn_ridestat:
 		{
 			popupWindow.dismiss();
+			destroyRes();
 			
 			Intent intent = new Intent(this, RideStatActivity.class);
 			startActivity(intent);
+			finish();
 			break;
 		}
 		case R.id.btn_setting:

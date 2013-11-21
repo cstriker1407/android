@@ -1,9 +1,11 @@
 package yeah.cstriker1407.android.rider.service;
 
 import java.lang.ref.WeakReference;
+import java.util.Date;
 
 import yeah.cstriker1407.android.rider.receiver.LocationBroadcast;
 import yeah.cstriker1407.android.rider.receiver.WeatherBroadcast;
+import yeah.cstriker1407.android.rider.storage.DBManager;
 import yeah.cstriker1407.android.rider.storage.Locations;
 import yeah.cstriker1407.android.rider.storage.Locations.LocDesc.LocTypeEnum;
 import yeah.cstriker1407.android.rider.utils.BDUtils;
@@ -107,14 +109,16 @@ public class LocationService extends Service implements onHttpResultListener
 		{
 			if (location == null)
 				return;
-			Locations.LocDesc locDesc = Locations.getInstance().getLocDes(
-					null, location.getLatitude(),location.getLongitude(),location.getRadius(),degree,BDUtils.BD2LocTypeEnum(location));
-			Log.d(TAG,locDesc.toString());
 			
-			Locations.SpeedInfo speedInfo = Locations.getInstance().calcSpeedInfo(
-					location.getLatitude(),
-					location.getLongitude());
-			Log.d(TAG,speedInfo.toString());
+			Date currDate = new Date();
+			
+			Locations.LocDesc locDesc = Locations.getInstance().getLocDes(
+					null, location.getLatitude(),location.getLongitude(),location.getRadius(), degree, currDate, BDUtils.BD2LocTypeEnum(location));
+//			Log.d(TAG,locDesc.toString());
+			
+			Locations.SpeedInfo speedInfo = Locations.getInstance().calcSpeedInfo(currDate, locDesc.longitude, locDesc.latitude);
+//			Log.d(TAG,speedInfo.toString());
+			DBManager.Instance.insertDB(locDesc, speedInfo);
 			
 			LocationBroadcast.sendBroadcast(LocationService.this, locDesc, speedInfo);
 
